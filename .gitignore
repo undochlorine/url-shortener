@@ -1,0 +1,13 @@
+.idea/
+.vscode/
+
+**/.env
+**/*.pb.go
+**/*_mock.go
+
+/docs
+
+**/*.pem
+
+# SWAGGO
+**/gateway/internal/docs
