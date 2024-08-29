@@ -3,21 +3,22 @@ package url
 import (
 	"context"
 	pb "url-shortener/pb/shortener"
+	"url-shortener/services/gateway/internal/client/url/cache"
 )
 
 type (
 	IClient interface {
-		GetUrl(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error)
-		Add(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error)
+		Get(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error)
+		Set(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error)
 	}
 
 	Client struct {
-		rpc pb.ShortenerClient
+		cache cache.Interface
 	}
 )
 
-func New(rpc pb.ShortenerClient) *Client {
+func New(cache cache.Interface) *Client {
 	return &Client{
-		rpc: rpc,
+		cache: cache,
 	}
 }

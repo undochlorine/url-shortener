@@ -6,46 +6,50 @@ import (
 	"sync"
 	"time"
 	pb "url-shortener/pb/shortener"
-	"url-shortener/services/gateway/internal/client/url"
 )
-
-const CACHE_SIZE = 10
 
 // Custom LRU implementation with TTL 1 hour + JITTER
 
 type (
-	CacheValue struct {
-		FullUrl   string
-		UsedTimes int
+	Interface interface {
+		Get(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error)
+		Set(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error)
 	}
 
-	CacheItem struct {
-		CacheValue
+	cacheValue struct {
+		fullUrl string
+	}
+
+	cacheItem struct {
+		cacheValue
+		usedTimes  int
 		expiration time.Time
 	}
 
-	Cache map[string]CacheItem
+	cache map[string]cacheItem
 
 	URLCache struct {
-		*url.Client
-		cache  Cache
-		ttl    time.Duration
-		jitter time.Duration
-		mutex  sync.Mutex
+		rpc       pb.ShortenerClient
+		cache     cache
+		cacheSize int
+		ttl       time.Duration
+		jitter    time.Duration
+		mutex     sync.Mutex
 	}
 )
 
-func New(client *url.Client, ttl, jitter time.Duration) *URLCache {
-	cache := make(Cache, CACHE_SIZE)
+func New(rpc pb.ShortenerClient, cacheSize int, ttl, jitter time.Duration) *URLCache {
+	c := make(cache, cacheSize)
 	return &URLCache{
-		Client: client,
-		cache:  cache,
-		ttl:    ttl,
-		jitter: jitter,
+		rpc:       rpc,
+		cache:     c,
+		cacheSize: cacheSize,
+		ttl:       ttl,
+		jitter:    jitter,
 	}
 }
 
-func (c *URLCache) Get(shortUrl string) (string, bool) {
+func (c *URLCache) getFromCache(shortUrl string) (string, bool) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -59,17 +63,17 @@ func (c *URLCache) Get(shortUrl string) (string, bool) {
 		return "", false
 	}
 
-	item.UsedTimes += 1
+	item.usedTimes += 1
 	c.cache[shortUrl] = item
 
-	return item.FullUrl, true
+	return item.fullUrl, true
 }
 
 func addJitter(maxJitter time.Duration) time.Duration {
 	return time.Duration(rand.Int63n(int64(maxJitter)*2)) - maxJitter
 }
 
-func (c *URLCache) set(shortUrl string, cv *CacheValue) {
+func (c *URLCache) setToCache(shortUrl string, cv *cacheValue) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -79,13 +83,14 @@ func (c *URLCache) set(shortUrl string, cv *CacheValue) {
 	// Calculate expiration time with jitter
 	expiration := time.Now().Add(c.ttl + jitter)
 
-	if len(c.cache) == CACHE_SIZE {
+	if len(c.cache) == c.cacheSize {
 		c.replace()
 	}
 
-	c.cache[shortUrl] = CacheItem{
-		CacheValue: *cv,
+	c.cache[shortUrl] = cacheItem{
+		cacheValue: *cv,
 		expiration: expiration,
+		usedTimes:  0,
 	}
 
 }
@@ -96,7 +101,7 @@ func (c *URLCache) invalidate(shortUrl string) {
 
 func (c *URLCache) replace() {
 	// LRU replacement algorithm
-	var lowest CacheItem
+	var lowest cacheItem
 	var lowestShortUrl string
 	i := 0
 	for sn, v := range c.cache {
@@ -108,7 +113,7 @@ func (c *URLCache) replace() {
 			lowest = v
 			lowestShortUrl = sn
 		} else {
-			if v.CacheValue.UsedTimes < lowest.CacheValue.UsedTimes {
+			if v.usedTimes < lowest.usedTimes {
 				lowest = v
 				lowestShortUrl = sn
 			}
@@ -116,20 +121,48 @@ func (c *URLCache) replace() {
 		i++
 	}
 	delete(c.cache, lowestShortUrl)
+
+	// optimization to avoid big integers
+	if lowest.usedTimes > 100_000 {
+		for _, v := range c.cache {
+			v.usedTimes -= lowest.usedTimes
+		}
+	}
 }
 
-// gRPC client methods
+// gRPC methods
 
-func (c *URLCache) GetUrl(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error) {
-	fullName, exists := c.Get(shortUrl.ShortUrl)
+func (c *URLCache) Get(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error) {
+	// read through
+
+	cacheV, exists := c.getFromCache(shortUrl.ShortUrl)
 	if exists {
-		return &pb.FullUrl{FullUrl: fullName}, nil
+		return &pb.FullUrl{FullUrl: cacheV}, nil
 	}
 
-	return c.Client.GetUrl(ctx, shortUrl)
+	fullUrl, err := c.rpc.Get(ctx, shortUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	c.setToCache(shortUrl.ShortUrl, &cacheValue{
+		fullUrl: fullUrl.FullUrl,
+	})
+
+	return fullUrl, nil
 }
 
-func (c *URLCache) Add(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error) {
+func (c *URLCache) Set(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error) {
+	// write through
 
-	return c.Client.Add(ctx, fullUrl)
+	shortUrl, err := c.rpc.Set(ctx, fullUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	c.setToCache(shortUrl.ShortUrl, &cacheValue{
+		fullUrl: fullUrl.FullUrl,
+	})
+
+	return shortUrl, nil
 }

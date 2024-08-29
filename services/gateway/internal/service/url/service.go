@@ -8,8 +8,8 @@ import (
 
 type (
 	Interface interface {
-		GetUrl(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error)
-		Add(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error)
+		Get(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error)
+		Set(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error)
 	}
 
 	Service struct {

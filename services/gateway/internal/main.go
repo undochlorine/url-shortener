@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"time"
 
 	shortenerPb "url-shortener/pb/shortener"
 	"url-shortener/services/gateway/config"
@@ -35,10 +36,10 @@ func runServices() {
 	}
 	defer urlCloser()
 
-	urlClient := urlClientPkg.New(urlRpc)
-	urlCache := urlCachePkg.New(urlClient)
+	urlCache := urlCachePkg.New(urlRpc, 10, time.Hour, time.Millisecond)
+	urlClient := urlClientPkg.New(urlCache)
 
-	urlService := urlServicePkg.New(urlCache)
+	urlService := urlServicePkg.New(urlClient)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
