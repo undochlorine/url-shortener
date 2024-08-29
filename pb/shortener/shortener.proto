@@ -1,0 +1,18 @@
+syntax = "proto3";
+package shortener;
+option go_package = "./shortener";
+
+message ShortUrl {
+  // Shortened URL @gotags: validate:"required|min_len:7|max_len:50"
+  string short_url = 1;
+}
+
+message FullUrl {
+  // Original (full) URL @gotags: validate:"required|min_len:7|max_len:50"
+  string full_url = 1;
+}
+
+service Shortener {
+  rpc GetUrl(ShortUrl) returns (FullUrl){}
+  rpc Add(FullUrl) returns (ShortUrl){}
+}
