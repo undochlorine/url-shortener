@@ -25,3 +25,13 @@ type (
 		Probe(ctx context.Context) error
 	}
 )
+
+func New(db storage.Interface) *Service {
+	return &Service{
+		db: db,
+	}
+}
+
+func (s *Service) Probe(ctx context.Context) error {
+	return s.db.Probe(ctx)
+}
