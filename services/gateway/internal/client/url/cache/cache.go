@@ -12,8 +12,8 @@ import (
 
 type (
 	Interface interface {
-		Get(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error)
-		Set(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error)
+		Get(ctx context.Context, shortUrl *pb.ShortUrlMsg) (*pb.FullUrlMsg, error)
+		Set(ctx context.Context, fullUrl *pb.FullUrlMsg) (*pb.ShortUrlMsg, error)
 	}
 
 	cacheValue struct {
@@ -132,12 +132,12 @@ func (c *URLCache) replace() {
 
 // gRPC methods
 
-func (c *URLCache) Get(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error) {
+func (c *URLCache) Get(ctx context.Context, shortUrl *pb.ShortUrlMsg) (*pb.FullUrlMsg, error) {
 	// read through
 
 	cacheV, exists := c.getFromCache(shortUrl.ShortUrl)
 	if exists {
-		return &pb.FullUrl{FullUrl: cacheV}, nil
+		return &pb.FullUrlMsg{FullUrl: cacheV}, nil
 	}
 
 	fullUrl, err := c.rpc.Get(ctx, shortUrl)
@@ -152,7 +152,7 @@ func (c *URLCache) Get(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl,
 	return fullUrl, nil
 }
 
-func (c *URLCache) Set(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error) {
+func (c *URLCache) Set(ctx context.Context, fullUrl *pb.FullUrlMsg) (*pb.ShortUrlMsg, error) {
 	// write through
 
 	shortUrl, err := c.rpc.Set(ctx, fullUrl)

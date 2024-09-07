@@ -8,8 +8,8 @@ import (
 
 type (
 	IClient interface {
-		Get(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error)
-		Set(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error)
+		Get(ctx context.Context, shortUrl *pb.ShortUrlMsg) (*pb.FullUrlMsg, error)
+		Set(ctx context.Context, fullUrl *pb.FullUrlMsg) (*pb.ShortUrlMsg, error)
 	}
 
 	Client struct {

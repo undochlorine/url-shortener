@@ -5,10 +5,10 @@ import (
 	pb "url-shortener/pb/shortener"
 )
 
-func (c Client) Get(ctx context.Context, shortUrl *pb.ShortUrl) (*pb.FullUrl, error) {
+func (c Client) Get(ctx context.Context, shortUrl *pb.ShortUrlMsg) (*pb.FullUrlMsg, error) {
 	return c.cache.Get(ctx, shortUrl)
 }
 
-func (c Client) Set(ctx context.Context, fullUrl *pb.FullUrl) (*pb.ShortUrl, error) {
+func (c Client) Set(ctx context.Context, fullUrl *pb.FullUrlMsg) (*pb.ShortUrlMsg, error) {
 	return c.cache.Set(ctx, fullUrl)
 }

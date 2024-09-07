@@ -26,7 +26,7 @@ func (s *Server) GetUrl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// todo: call svc -> get fullLink, err
-	fullUrl, err := s.urlSvc.Get(r.Context(), &pb.ShortUrl{ShortUrl: shortUrl})
+	fullUrl, err := s.urlSvc.Get(r.Context(), &pb.ShortUrlMsg{ShortUrl: shortUrl})
 
 	u, err := protojson.Marshal(fullUrl)
 	if err != nil {
@@ -50,7 +50,7 @@ func (s *Server) SetUrl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// todo: call svc -> get shortUrl, err
-	shortUrl, err := s.urlSvc.Set(r.Context(), &pb.FullUrl{FullUrl: fullUrl})
+	shortUrl, err := s.urlSvc.Set(r.Context(), &pb.FullUrlMsg{FullUrl: fullUrl})
 
 	u, err := protojson.Marshal(shortUrl)
 	if err != nil {
