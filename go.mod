@@ -10,6 +10,8 @@ require (
 )
 
 require (
+	github.com/favadi/protoc-go-inject-tag v1.4.0 // indirect
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/gookit/filter v1.2.1 // indirect
 	github.com/gookit/goutil v0.6.15 // indirect
 	golang.org/x/net v0.26.0 // indirect
