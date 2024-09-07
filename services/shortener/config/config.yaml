@@ -1,0 +1,5 @@
+LogLevel: "Debug"
+Host: "0.0.0.0:8081"
+Database: "postgres://root:secret@localhost:5432/b2g-db?sslmode=disable"
+DBMaxIdleTime: "60s"
+AppMode: "dev"

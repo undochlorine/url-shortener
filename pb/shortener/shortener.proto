@@ -2,15 +2,15 @@ syntax = "proto3";
 package shortener;
 option go_package = "./shortener";
 
-message ShortUrl {
+message ShortUrlMsg {
   string short_url = 1;
 }
 
-message FullUrl {
+message FullUrlMsg {
   string full_url = 1;
 }
 
 service Shortener {
-  rpc Get(ShortUrl) returns (FullUrl){}
-  rpc Set(FullUrl) returns (ShortUrl){}
+  rpc Get(ShortUrlMsg) returns (FullUrlMsg){}
+  rpc Set(FullUrlMsg) returns (ShortUrlMsg){}
 }
