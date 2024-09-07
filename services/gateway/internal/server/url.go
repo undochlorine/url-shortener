@@ -10,20 +10,11 @@ func (s *Server) UrlHandler() http.Handler {
 	handler := http.NewServeMux()
 
 	handler.HandleFunc("GET /", s.GetUrl)
-	handler.HandleFunc("POST /", s.AddUrl)
+	handler.HandleFunc("POST /", s.SetUrl)
 
 	return handler
 }
 
-// GetUrl
-// @Summary Get website
-// @Description Get redirected to origin website, using shortened link
-// @Tags URL
-// @Produce json
-// @Param short_url query string true "Short url"
-// @Success 200 {object} handbook.CustomersHandbookMsg
-// @Failure 500 {string} string "Internal error"
-// @Router /url/ [get]
 func (s *Server) GetUrl(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -48,16 +39,7 @@ func (s *Server) GetUrl(w http.ResponseWriter, r *http.Request) {
 	w.Write(u)
 }
 
-// AddUrl
-// @Summary Add URL
-// @Description Create alias for the link
-// @Tags URL
-// @Produce json
-// @Param full_url query string true "URL to be shortened"
-// @Success 200 {object} handbook.CustomersHandbookMsg
-// @Failure 500 {string} string "Internal error"
-// @Router /url/ [post]
-func (s *Server) AddUrl(w http.ResponseWriter, r *http.Request) {
+func (s *Server) SetUrl(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	fullUrl := r.URL.Query().Get("full_url")
