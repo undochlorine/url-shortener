@@ -26,7 +26,7 @@ func New(db *sqlx.DB) Storage {
 	}
 }
 
-func (s Storage) Probe(ctx context.Context) error {
+func (s *Storage) Probe(ctx context.Context) error {
 	if err := s.db.PingContext(ctx); err != nil {
 		log.Fatalf("cannot connect to database: %v", err)
 		return err
