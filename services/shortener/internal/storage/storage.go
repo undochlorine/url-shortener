@@ -16,7 +16,7 @@ type (
 		Probe(ctx context.Context) error
 
 		Get(ctx context.Context, shortUrl *core.ShortUrl) (*core.FullUrl, error)
-		Set(ctx context.Context, fullUrl *core.FullUrl) (*core.ShortUrl, error)
+		Set(ctx context.Context, fullUrl *core.Pair) error
 	}
 )
 

@@ -18,11 +18,11 @@ func (s *Server) Get(ctx context.Context, shortUrl *proto.ShortUrlMsg) (*proto.F
 }
 
 func (s *Server) Set(ctx context.Context, fullUrl *proto.FullUrlMsg) (*proto.ShortUrlMsg, error) {
-	shortUrl, err := s.service.Set(ctx, core.FullUrlFromPb(fullUrl))
+	_, err := s.service.Set(ctx, core.FullUrlFromPb(fullUrl))
 	if err != nil {
 		log.Fatalf("cannot set url: %s", err)
 		return nil, err
 	}
 
-	return core.ShortUrlToPb(shortUrl), nil
+	return nil, nil
 }

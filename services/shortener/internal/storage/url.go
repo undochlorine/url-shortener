@@ -9,6 +9,6 @@ func (s *Storage) Get(ctx context.Context, shortUrl *core.ShortUrl) (*core.FullU
 	return nil, nil
 }
 
-func (s *Storage) Set(ctx context.Context, fullUrl *core.FullUrl) (*core.ShortUrl, error) {
-	return nil, nil
+func (s *Storage) Set(ctx context.Context, fullUrl *core.Pair) error {
+	return nil
 }

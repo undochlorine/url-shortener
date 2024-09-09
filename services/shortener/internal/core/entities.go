@@ -33,3 +33,8 @@ func FullUrlFromPb(f *pb.FullUrlMsg) *FullUrl {
 		FullUrl: f.FullUrl,
 	}
 }
+
+type Pair struct {
+	ShortUrl string `db:"short_url"`
+	FullUrl  string `db:"full_url"`
+}

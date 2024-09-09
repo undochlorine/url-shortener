@@ -6,6 +6,7 @@ require (
 	github.com/gookit/validate v1.5.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/jmoiron/sqlx v1.4.0
+	github.com/xrmon/sha v0.0.0-20190912160722-815dcdff419c
 	google.golang.org/grpc v1.66.0
 	google.golang.org/protobuf v1.34.2
 	gopkg.in/yaml.v3 v3.0.1

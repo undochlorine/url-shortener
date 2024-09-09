@@ -10,5 +10,15 @@ func (s *Service) Get(ctx context.Context, shortUrl *core.ShortUrl) (*core.FullU
 }
 
 func (s *Service) Set(ctx context.Context, fullUrl *core.FullUrl) (*core.ShortUrl, error) {
-	return s.db.Set(ctx, fullUrl)
+	pair := &core.Pair{
+		ShortUrl: core.Shorten(fullUrl.FullUrl),
+		FullUrl:  fullUrl.FullUrl,
+	}
+
+	err := s.db.Set(ctx, pair)
+	if err != nil {
+		return nil, err
+	}
+
+	return &core.ShortUrl{ShortUrl: pair.ShortUrl}, nil
 }
