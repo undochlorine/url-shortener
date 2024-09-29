@@ -22,15 +22,6 @@ func New(urlSvc url.Interface) *Server {
 	}
 }
 
-// Run
-// @title          URL Shortener API
-// @version        0.1
-// @description    API платформы URL Shortener
-// @termsOfService http://swagger.io/terms/
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
-// @host      		 0.0.0.0:8080
-// @BasePath /
 func (s *Server) Run(ctx context.Context, host, port string) {
 	handler := http.NewServeMux()
 
@@ -45,7 +36,7 @@ func (s *Server) Run(ctx context.Context, host, port string) {
 	server := http.Server{
 		Addr:         fmt.Sprintf("%v:%v", host, port),
 		Handler:      globalChain(handler),
-		ReadTimeout:  10 * time.Second,
+		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 

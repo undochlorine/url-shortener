@@ -14,15 +14,19 @@ func (s *Server) Get(ctx context.Context, shortUrl *proto.ShortUrlMsg) (*proto.F
 		return nil, err
 	}
 
+	if fullUrl == nil {
+		return nil, nil
+	}
+
 	return core.FullUrlToPb(fullUrl), nil
 }
 
 func (s *Server) Set(ctx context.Context, fullUrl *proto.FullUrlMsg) (*proto.ShortUrlMsg, error) {
-	_, err := s.service.Set(ctx, core.FullUrlFromPb(fullUrl))
+	shortUrl, err := s.service.Set(ctx, core.FullUrlFromPb(fullUrl))
 	if err != nil {
 		log.Fatalf("cannot set url: %s", err)
 		return nil, err
 	}
 
-	return nil, nil
+	return core.ShortUrlToPb(shortUrl), nil
 }

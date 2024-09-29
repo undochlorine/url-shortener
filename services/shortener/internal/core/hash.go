@@ -3,7 +3,6 @@ package core
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"strconv"
 )
 
 var numbers = []byte("0123456789")
@@ -17,7 +16,7 @@ func isByteANumber(b byte) bool {
 	return false
 }
 
-func hash(inp string) string {
+func Shorten(inp string) string {
 	if len(inp) == 0 {
 		return ""
 	}
@@ -30,8 +29,14 @@ func hash(inp string) string {
 		for i := 0; i < len(url); {
 			res = append(res, url[i])
 			if isByteANumber(url[i]) {
-				hoop, _ := strconv.Atoi(string(url[i]))
+				hoop := int(url[i] - '0') // Convert byte to integer directly
+				if hoop == 0 {            // Prevent division by zero
+					hoop = 1
+				}
 				i += len(url) % hoop
+				if i >= len(url) { // Avoid out-of-bounds access
+					break
+				}
 				continue
 			}
 			i += 2
@@ -39,21 +44,4 @@ func hash(inp string) string {
 		url = res
 	}
 	return hex.EncodeToString(url)
-}
-
-func Shorten(url string) string {
-	slashes := 0
-	for i, r := range url {
-		if r == '/' {
-			slashes++
-		}
-		if slashes == 2 {
-			hashed := hash(url[i+1:])
-			if hashed == "" {
-				return ""
-			}
-			return "http://" + hashed
-		}
-	}
-	return ""
 }

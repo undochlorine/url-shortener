@@ -10,6 +10,11 @@ message FullUrlMsg {
   string full_url = 1;
 }
 
+message PairMsg {
+  string short_url = 1;
+  string full_url = 2;
+}
+
 service Shortener {
   rpc Get(ShortUrlMsg) returns (FullUrlMsg){}
   rpc Set(FullUrlMsg) returns (ShortUrlMsg){}

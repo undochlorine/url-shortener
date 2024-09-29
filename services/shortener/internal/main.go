@@ -11,6 +11,8 @@ import (
 	"url-shortener/services/shortener/internal/server"
 	"url-shortener/services/shortener/internal/service"
 	"url-shortener/services/shortener/internal/storage"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func main() {
@@ -32,7 +34,7 @@ func main() {
 
 	storage := storage.New(db)
 
-	svc := service.New(storage)
+	svc := service.New(&storage)
 
 	builder := server.GrpcServerBuilder{}
 	builder.SetService(svc)
