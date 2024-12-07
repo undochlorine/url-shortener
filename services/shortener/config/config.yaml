@@ -1,0 +1,5 @@
+LogLevel: "Debug"
+Host: "0.0.0.0:8081"
+Database: "postgres://postgres:31415@localhost:5432/us?sslmode=disable"
+DBMaxIdleTime: "60s"
+AppMode: "dev"
